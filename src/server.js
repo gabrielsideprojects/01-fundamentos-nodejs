@@ -4,6 +4,10 @@ import http from 'node:http'
 import { json } from './middlewares/json.js'
 import { routes } from './routes.js'
 
+//Query Parameters: URL Stateful => Filtros, paginação ,não-obrigatório;
+// Route Parameters: https://localhost:3333/users/1 -> Geralmente identificação de recurso;
+// Request Body: Envio de informações de um formulário.
+
 //UUID => Unique Universal ID;
 
 // - HTTP
@@ -39,10 +43,12 @@ const server = http.createServer(async (req,res)=> {
    await json(req,res)
 
     const route = routes.find(route => {
-        return route.method === method && route.path === url
+        return route.method === method && route.path.test(url)
     })
 
     if (route) {
+        const routeParams = req.url.match(route.path)
+        
         return route.handler(req, res)
     }
 
